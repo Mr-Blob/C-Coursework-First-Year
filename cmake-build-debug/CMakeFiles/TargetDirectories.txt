@@ -1,0 +1,3 @@
+/home/mrblob/CLionProjects/C coursework/cmake-build-debug/CMakeFiles/C_coursework.dir
+/home/mrblob/CLionProjects/C coursework/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/mrblob/CLionProjects/C coursework/cmake-build-debug/CMakeFiles/rebuild_cache.dir
