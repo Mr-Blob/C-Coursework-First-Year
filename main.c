@@ -11,18 +11,17 @@ void printQuestions(float *variable, char question[][30], int size, int positive
 
 void print_vOut(float vOut, int vPlus, int vMinus);
 
-int read_int(char *prompt) {
+int amp_question(char *question) {
     int result;
-
-    printf("%s: ", prompt);
-    while(scanf("%d", &result) != 1) {
+    printf("%s: ", question);
+    while (scanf("%d", &result) != 1) {
         printf("Input was not an integer. Try again.\n");
-        printf("%s: ", prompt);
+        printf("%s: ", question);
     }
     return result;
 }
-/*
-int read_int_range(char *prompt, int min, int max) {
+
+/*int read_int_range(char *prompt, int min, int max) {
     int result = read_int(prompt);
 
     while (result < min || result > max) {
@@ -32,25 +31,26 @@ int read_int_range(char *prompt, int min, int max) {
     return result;
 }
 */
+
+int is_positive(float input) {
+    if (input >= 0) {
+        return 1;
+    }
+    if (input < 0) {
+        printf("The value entered is not a positive value, please try again.\n");
+        return 0;
+    }
+}
+
 int main(void) {
-    int amp_op = 0;
     int vPlus = 0;
     int vMinus = 0;
-    while (1) {
-        printf("What type of amplifier do you want to calculate (Type the number):\n");
-        printf("1. Summing Amplifier\n");
-        printf("2. Inverting Amplifier\n");
-        printf("3. Non-Inverting Amplifier\n");
-        amp_op = getchar();
 
-        printf("%c\n", amp_op);
-        if (strchr("123", amp_op) != NULL) {
-            break;
-        }
+    int amp_op = amp_question("What type of amp would you like to calculate?\n"
+                              "1. Summing Amplifier\n"
+                              "2. Inverting Amplifier\n"
+                              "3. Non-Inverting Amplifier\n");
 
-        printf("Invalid option selected.\n");
-
-    }
 
     printf("Option: %c selected.\n", amp_op);
     printf("\n");
@@ -60,18 +60,16 @@ int main(void) {
     printf("\n");
 
     printf("What value is needed for the positive voltage rail of the op amp?\n");
-    scanf("%i", &vPlus);
+    scanf("%d", &vPlus);
 
     printf("What value is needed for the positive voltage rail of the op amp?\n");
     scanf("%i", &vMinus);
 
     if (amp_op == 1) {
         summingAmplifier(vMinus, vPlus);
-    }
-    else if (amp_op == 2) {
+    } else if (amp_op == 2) {
         invertingAmplifier(vMinus, vPlus);
-    }
-    else if (amp_op == 3) {
+    } else if (amp_op == 3) {
         nonInvertingAmplifier(vMinus, vPlus);
     }
 
@@ -133,14 +131,10 @@ void printQuestions(float *variable, char question[][30], int size, int positive
     for (int i = 0; i < size; i++) {
         float value = 0;
         if (positive == 1) {
-            while (value <= 0) {
+            while (is_positive(value) == 0) {
                 fflush(stdin);
                 printf("%s", question[i]);
                 scanf("%f", &value);
-
-                if (value <= 0) {
-                    printf("The value entered is not a positive value, please try again.\n");
-                }
             }
         } else if (positive == 0) {
             fflush(stdin);
