@@ -3,9 +3,9 @@
 
 void summing_amplifier(int vMinus, int vPlus, int num_inputs);
 
-void inverting_amplifier(int vMinus, int vPlus);
+void inverting_amplifier(int vMinus, int vPlus, int num_inputs);
 
-void non_inverting_amplifier(int vMinus, int vPlus);
+void non_inverting_amplifier(int vMinus, int vPlus, int num_inputs);
 
 void print_questions(float variables_in[], char *question[], int size, bool require_positive);
 
@@ -19,7 +19,7 @@ int check_real_int(char *question);
 
 float int_range(char *question, float min, float max);
 
-bool yes_no(char input);
+bool yes_no(char input, char *question);
 
 int main(void) {
     bool repeat; // True for repeating the program again.
@@ -50,28 +50,27 @@ int main(void) {
 
         if (amp_op == 1) {
             summing_amplifier(vMinus, vPlus, num_inputs);
-        } /*else if (amp_op == 2) {
-            inverting_amplifier(vMinus, vPlus);
+        } else if (amp_op == 2) {
+            inverting_amplifier(vMinus, vPlus, num_inputs);
         } else if (amp_op == 3) {
-            non_inverting_amplifier(vMinus, vPlus);
-        }*/
+            non_inverting_amplifier(vMinus, vPlus, num_inputs);
+        }
 
         clear_buffer();
-        printf("\nDo you want to reset the values and try again? (Y/N)\n");
-        scanf("%c", &repeat_q);
-        repeat = yes_no(repeat_q);
+        char value_repeat_question[] = "\nDo you want to reset the values and try again? (Y/N)\n";
+        repeat = yes_no(repeat_q, value_repeat_question);
 
-        if (repeat == true) {
+        if (repeat) {
             clear_buffer();
-            printf("\nDo you want to use the same amplifier again? (Y/N)\n");
-            scanf("%c", &repeat_amp);
-            repeat_a = yes_no(repeat_amp);
-            if (repeat_a == false) {
+            char amp_repeat_question[] = "\nDo you want to use the same amplifier again? (Y/N)\n";
+            repeat_a = yes_no(repeat_amp, amp_repeat_question);
+
+            if (!repeat_a) {
                 amp_op = 0;
             }
         }
 
-    } while (repeat == true);
+    } while (repeat);
 
     return 0;
 }
@@ -105,73 +104,84 @@ void summing_amplifier(int vMinus, int vPlus, int num_inputs) {
                        ((set[i].voltages[0] / set[i].resistors[0]) + (set[i].voltages[1] / set[i].resistors[1])));
     }
     for (int f = 0; f < num_inputs; f++) {
-        printf("Output %i:\n",f+1);
+        printf("Output %i:\n", f + 1);
         print_vOut(set[f].vOut, vPlus, vMinus);
         gain(set[f].resistors, 2, true);
     }
 }
 
-/*
-void inverting_amplifier(int vMinus, int vPlus) {
-    float resistors[2];
-    float voltages[1];
-    float vOut;
 
-    char *resistor_questions[] = {
-            "What is the value for R1?\n",
-            "What is the value for Rf?\n"
+void inverting_amplifier(int vMinus, int vPlus, int num_inputs) {
+    struct inputs {
+        float resistors[2];
+        float voltages[1];
+        float vOut;
     };
+    struct inputs set[num_inputs];
+    for (int i = 0; i < num_inputs; i++) {
+        char *resistor_questions[] = {
+                "What is the value for R1?\n",
+                "What is the value for Rf?\n"
+        };
 
-    char *voltage_questions[] = {
-            "What is the value for Vin?\n"
-    };
+        char *voltage_questions[] = {
+                "What is the value for Vin?\n"
+        };
 
-    print_questions(resistors, resistor_questions, 2, true);
-    print_questions(voltages, voltage_questions, 1, false);
+        print_questions(set[i].resistors, resistor_questions, 2, true);
+        print_questions(set[i].voltages, voltage_questions, 1, false);
 
-    vOut = (-(resistors[1] / resistors[0]) * voltages[0]);
+        set[i].vOut = (-(set[i].resistors[1] / set[i].resistors[0]) * set[i].voltages[0]);
+    }
 
-    print_vOut(vOut, vPlus, vMinus);
-
-    gain(resistors, 1, true);
+    for (int f = 0; f < num_inputs; f++) {
+        printf("Output %i:\n", f + 1);
+        print_vOut(set[f].vOut, vPlus, vMinus);
+        gain(set[f].resistors, 1, true);
+    }
 }
 
-void non_inverting_amplifier(int vMinus, int vPlus) {
-    float resistors[2];
-    float voltages[1];
-    float vOut;
-
-    char *resistor_questions[] = {
-            "What is the value for R1?\n",
-            "What is the value for Rf?\n"
+void non_inverting_amplifier(int vMinus, int vPlus, int num_inputs) {
+    struct inputs {
+        float resistors[2];
+        float voltages[1];
+        float vOut;
     };
+    struct inputs set[num_inputs];
+    for (int i = 0; i < num_inputs; i++) {
+        char *resistor_questions[] = {
+                "What is the value for R1?\n",
+                "What is the value for Rf?\n"
+        };
 
-    char *voltage_questions[] = {
-            "What is the value for Vin?\n"
-    };
+        char *voltage_questions[] = {
+                "What is the value for Vin?\n"
+        };
 
-    print_questions(resistors, resistor_questions, 2, true);
-    print_questions(voltages, voltage_questions, 1, false);
+        print_questions(set[i].resistors, resistor_questions, 2, true);
+        print_questions(set[i].voltages, voltage_questions, 1, false);
 
-    vOut = (voltages[0] + (voltages[0] / resistors[0]) * resistors[1]);
-
-    print_vOut(vOut, vPlus, vMinus);
-
-    gain(resistors, 1, false);
+        set[i].vOut = (set[i].voltages[0] + (set[i].voltages[0] / set[i].resistors[0]) * set[i].resistors[1]);
+    }
+    for (int f = 0; f < num_inputs; f++) {
+        printf("Output %i:\n", f + 1);
+        print_vOut(set[f].vOut, vPlus, vMinus);
+        gain(set[f].resistors, 1, false);
+    }
 
 }
-*/
+
 void print_questions(float variables[], char *question[], int size, bool require_positive) {
     for (int i = 0; i < size; i++) {
         float value = 0;
-        if (require_positive == true) {
+        if (require_positive) {
             while (value <= 0) {
                 value = check_real_int(question[i]);
                 if (value <= 0) {
                     printf("The value entered is not a positive value, please try again.\n");
                 }
             }
-        } else if (require_positive == false) {
+        } else {
             value = check_real_int(question[i]);
         }
         variables[i] = value;
@@ -197,9 +207,9 @@ void print_vOut(float input_sets, int vPlus, int vMinus) {
 void gain(float *resistors, int length, bool is_invert) {
     float gain;
     for (int i = 0; i < length; i++) {
-        if (is_invert == true) {
+        if (is_invert) {
             gain = (-(resistors[length] / resistors[i]));
-        } else if (is_invert == false) {
+        } else {
             gain = (1 + (resistors[1] / resistors[0]));
         }
         printf("The gain for input %i is: %.2f.\n", i + 1, gain);
@@ -240,14 +250,21 @@ float int_range(char *question, float min, float max) {
     return result;
 }
 
-bool yes_no(char input) {
-    if (input == 'Y' || input == 'y') {
-        return true;
+bool yes_no(char input, char *question) {
+    char repeat_amp;
+    while (true) {
+        printf("%s", question);
+        scanf("%c", &repeat_amp);
 
-    } else if (input == 'N' || input == 'n') {
-        return false;
+        if (input == 'Y' || input == 'y') {
+            return true;
 
-    } else {
-        printf("This is not a valid input. Use Y or N.\n");
+        } else if (input == 'N' || input == 'n') {
+            return false;
+
+        } else {
+            printf("This is not a valid input. Use Y or N.\n");
+
+        }
     }
 }
