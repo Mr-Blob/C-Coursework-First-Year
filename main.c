@@ -14,22 +14,24 @@ void printQuestions(float variable[], char *question[], int size, bool require_p
 
 void print_vOut(float vOut, int vPlus, int vMinus);
 
-void clear_buffer(void) { // This function clears whatever# is left from the input.
+void clear_buffer(void) {
+    // This function clears whatever# is left from the input.
     int clear;
     do {
-        clear = getchar(); // getchar() reads a character sequentially from the input buffer, but it also removes the character from the input buffer at the same time.
-    } while (clear != EOF && clear !=
-                             '\n'); // This while loop will repeat until the last thing in the buffer is a new line, which is given once the user presses enter to submit an input.
+        clear = getchar();
+        // getchar() reads a character sequentially from the input buffer, but it also removes the character from the input buffer at the same time.
+    } while (clear != EOF && clear != '\n');
+    // This while loop will repeat until the last thing in the buffer is a new line, which is given once the user presses enter to submit an input.
 }
 
 
-int check_real_int(
-        char *question) { // This function checks if the value input is actually an integer, this prevents words being input, for example.
+int check_real_int(char *question) {
+    // This function checks if the value input is actually an integer, this prevents words being input, for example.
     int result;
     printf("%s", question);
 
-    while (scanf("%d", &result) !=
-           1) { // Scanf will check try and read the input as a decimal, if it reads correctly it will output a 1. If it can't cast it to a decimal it will return a 0.
+    while (scanf("%d", &result) != 1) {
+        // Scanf will check try and read the input as a decimal, if it reads correctly it will output a 1. If it can't cast it to a decimal it will return a 0.
         clear_buffer();
         printf("Input was not an integer. Try again.\n");
         printf("%s", question);
@@ -48,27 +50,43 @@ float int_range(char *question, float min, float max) {
 }
 
 int main(void) {
-    int amp_op = int_range("What type of amp would you like to calculate?\n"
-                                "1. Summing Amplifier\n"
-                                "2. Inverting Amplifier\n"
-                                "3. Non-Inverting Amplifier\n", 1, 3);
+    bool repeat;
+    do {
+        char repeat_q;
+        int amp_op = int_range("What type of amp would you like to calculate?\n"
+                               "1. Summing Amplifier\n"
+                               "2. Inverting Amplifier\n"
+                               "3. Non-Inverting Amplifier\n", 1, 3);
 
-    printf("Option: %i selected.\n", amp_op);
-    printf("\n");
+        printf("Option: %i selected.\n\n", amp_op);
 
-    float vPlus = int_range("What value is needed for the positive voltage rail of the op amp?\n", 0,
-                            600); // This limits the positive rail of the amplifier to 600V max.
+        float vPlus = int_range("What value is needed for the positive voltage rail of the op amp?\n", 0,
+                                600); // This limits the positive rail of the amplifier to 600V max.
 
-    float vMinus = int_range("What value is needed for the negative voltage rail of the op amp?\n", -600, 0);
+        float vMinus = int_range("What value is needed for the negative voltage rail of the op amp?\n", -600, 0);
 
-    if (amp_op == 1) {
-        summingAmplifier(vMinus, vPlus);
-    } else if (amp_op == 2) {
-        invertingAmplifier(vMinus, vPlus);
-    } else if (amp_op == 3) {
-        nonInvertingAmplifier(vMinus, vPlus);
-    }
+        if (amp_op == 1) {
+            summingAmplifier(vMinus, vPlus);
+        } else if (amp_op == 2) {
+            invertingAmplifier(vMinus, vPlus);
+        } else if (amp_op == 3) {
+            nonInvertingAmplifier(vMinus, vPlus);
+        }
 
+        clear_buffer();
+        printf("\nDo you want to reset and try again? (Y/N)\n");
+        scanf("%c", &repeat_q);
+
+        if (repeat_q == 'Y' || repeat_q == 'y') {
+            repeat = true;
+        } else if (repeat_q == 'N' || repeat_q == 'n') {
+            repeat = false;
+        } else {
+            printf("This is not a valid input. Use Y or N.\n");
+        }
+    } while (repeat == true);
+
+    return 0;
 }
 
 void summingAmplifier(int vMinus, int vPlus) {
@@ -127,9 +145,9 @@ void printQuestions(float variable[], char *question[], int size, bool require_p
     for (int i = 0; i < size; i++) {
         float value = 0;
         if (require_positive == true) {
-            while (value < 0) {
+            while (value <= 0) {
                 value = check_real_int(question[i]);
-                if (value < 0) {
+                if (value <= 0) {
                     printf("The value entered is not a positive value, please try again.\n");
                 }
             }
