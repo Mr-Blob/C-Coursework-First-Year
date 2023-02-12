@@ -1,69 +1,65 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdbool.h>
 
+/* If
+ *
+ */
 void summingAmplifier(int vMinus, int vPlus);
 
 void invertingAmplifier(int vMinus, int vPlus);
 
 void nonInvertingAmplifier(int vMinus, int vPlus);
 
-void printQuestions(float *variable, char question[][30], int size, int positive);
+void printQuestions(float variable[], char *question[], int size, bool require_positive);
 
 void print_vOut(float vOut, int vPlus, int vMinus);
 
-int amp_question(char *question) {
+void clear_buffer(void) { // This function clears whatever# is left from the input.
+    int clear;
+    do {
+        clear = getchar(); // getchar() reads a character sequentially from the input buffer, but it also removes the character from the input buffer at the same time.
+    } while (clear != EOF && clear !=
+                             '\n'); // This while loop will repeat until the last thing in the buffer is a new line, which is given once the user presses enter to submit an input.
+}
+
+
+int check_real_int(
+        char *question) { // This function checks if the value input is actually an integer, this prevents words being input, for example.
     int result;
-    printf("%s: ", question);
-    while (scanf("%d", &result) != 1) {
+    printf("%s", question);
+
+    while (scanf("%d", &result) !=
+           1) { // Scanf will check try and read the input as a decimal, if it reads correctly it will output a 1. If it can't cast it to a decimal it will return a 0.
+        clear_buffer();
         printf("Input was not an integer. Try again.\n");
-        printf("%s: ", question);
+        printf("%s", question);
     }
     return result;
 }
 
-/*int read_int_range(char *prompt, int min, int max) {
-    int result = read_int(prompt);
+float int_range(char *question, float min, float max) {
+    float result = check_real_int(question);
 
     while (result < min || result > max) {
-        printf("Input must be between %d and %d. Try again.\n", min, max);
-        result = read_int(prompt);
+        printf("Input must be between %.0f and %.0f. Try again.\n", min, max);
+        result = check_real_int(question);
     }
     return result;
-}
-*/
-
-int is_positive(float input) {
-    if (input >= 0) {
-        return 1;
-    }
-    if (input < 0) {
-        printf("The value entered is not a positive value, please try again.\n");
-        return 0;
-    }
 }
 
 int main(void) {
-    int vPlus = 0;
-    int vMinus = 0;
-
-    int amp_op = amp_question("What type of amp would you like to calculate?\n"
-                              "1. Summing Amplifier\n"
-                              "2. Inverting Amplifier\n"
-                              "3. Non-Inverting Amplifier\n");
-
-
-    printf("Option: %c selected.\n", amp_op);
-    printf("\n");
-
+    int amp_op = int_range("What type of amp would you like to calculate?\n"
+                                "1. Summing Amplifier\n"
+                                "2. Inverting Amplifier\n"
+                                "3. Non-Inverting Amplifier\n", 1, 3);
 
     printf("Option: %i selected.\n", amp_op);
     printf("\n");
 
-    printf("What value is needed for the positive voltage rail of the op amp?\n");
-    scanf("%d", &vPlus);
+    float vPlus = int_range("What value is needed for the positive voltage rail of the op amp?\n", 0,
+                            600); // This limits the positive rail of the amplifier to 600V max.
 
-    printf("What value is needed for the positive voltage rail of the op amp?\n");
-    scanf("%i", &vMinus);
+    float vMinus = int_range("What value is needed for the negative voltage rail of the op amp?\n", -600, 0);
 
     if (amp_op == 1) {
         summingAmplifier(vMinus, vPlus);
@@ -80,18 +76,18 @@ void summingAmplifier(int vMinus, int vPlus) {
     float voltages[2];
     float vOut;
 
-    char resistor_questions[3][30] = {
+    char *resistor_questions[] = {
             "What is the value for R1?\n",
             "What is the value for R2?\n",
             "What is the value for Rf?\n"
     };
-    char voltage_questions[2][30] = {
+    char *voltage_questions[] = {
             "What is the value for V1?\n",
             "What is the value for V2?\n"
     };
 
-    printQuestions(resistors, resistor_questions, 3, 1);
-    printQuestions(voltages, voltage_questions, 2, 0);
+    printQuestions(resistors, resistor_questions, 3, true);
+    printQuestions(voltages, voltage_questions, 2, false);
 
     vOut = (-resistors[2] *
             ((voltages[0] / resistors[0]) + (voltages[1] / resistors[1])));
@@ -127,19 +123,18 @@ void nonInvertingAmplifier(int vMinus, int vPlus) {
     print_vOut(vOut, vPlus, vMinus);*/
 }
 
-void printQuestions(float *variable, char question[][30], int size, int positive) {
+void printQuestions(float variable[], char *question[], int size, bool require_positive) {
     for (int i = 0; i < size; i++) {
         float value = 0;
-        if (positive == 1) {
-            while (is_positive(value) == 0) {
-                fflush(stdin);
-                printf("%s", question[i]);
-                scanf("%f", &value);
+        if (require_positive == true) {
+            while (value < 0) {
+                value = check_real_int(question[i]);
+                if (value < 0) {
+                    printf("The value entered is not a positive value, please try again.\n");
+                }
             }
-        } else if (positive == 0) {
-            fflush(stdin);
-            printf("%s", question[i]);
-            scanf("%f", &value);
+        } else if (require_positive == false) {
+            value = check_real_int(question[i]);
         }
         variable[i] = value;
 
