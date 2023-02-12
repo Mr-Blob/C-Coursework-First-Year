@@ -51,17 +51,20 @@ float int_range(char *question, float min, float max) {
 
 int main(void) {
     bool repeat;
+    int amp_op = 0;
     do {
         char repeat_q;
-        int amp_op = int_range("What type of amp would you like to calculate?\n"
+        if(amp_op == 0) {
+            amp_op = int_range("What type of amp would you like to calculate?\n"
                                "1. Summing Amplifier\n"
                                "2. Inverting Amplifier\n"
                                "3. Non-Inverting Amplifier\n", 1, 3);
 
-        printf("Option: %i selected.\n\n", amp_op);
+            printf("Option: %i selected.\n\n", amp_op);
+        }
 
-        float vPlus = int_range("What value is needed for the positive voltage rail of the op amp?\n", 0,
-                                600); // This limits the positive rail of the amplifier to 600V max.
+        float vPlus = int_range("What value is needed for the positive voltage rail of the op amp?\n", 0, 600);
+        // This limits the positive rail of the amplifier to 600V max.
 
         float vMinus = int_range("What value is needed for the negative voltage rail of the op amp?\n", -600, 0);
 
@@ -74,7 +77,7 @@ int main(void) {
         }
 
         clear_buffer();
-        printf("\nDo you want to reset and try again? (Y/N)\n");
+        printf("\nDo you want to reset the values and try again? (Y/N)\n");
         scanf("%c", &repeat_q);
 
         if (repeat_q == 'Y' || repeat_q == 'y') {
@@ -85,6 +88,7 @@ int main(void) {
             printf("This is not a valid input. Use Y or N.\n");
         }
     } while (repeat == true);
+
 
     return 0;
 }
