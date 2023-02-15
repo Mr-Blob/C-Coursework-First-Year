@@ -39,7 +39,10 @@ bool yes_no(char *question);
 int compare(const void *a, const void *b);
 
 
-struct inputs { // This creates a structure to store the values of a circuit. An array of these structures is used to
+
+
+struct inputs {
+    // This creates a structure to store the values of a circuit. An array of these structures is used to store the values needed for each circuit.
 
     int id;
     /* This is a simple way to reference which set of inputs are being shown after the array has been sorted.
@@ -56,6 +59,8 @@ struct inputs { // This creates a structure to store the values of a circuit. An
     float voltages[2];  // This makes an array of floats to store the voltage values.
     float vOut;
 };
+
+
 
 int main(void) {
     bool repeat; // True for repeating the program again.
@@ -81,9 +86,10 @@ int main(void) {
 
 
         float vPlus = int_range("What value is needed for the positive voltage rail of the op amp?\n", 0, 600);
-        // This limits the positive rail of the amplifier to 600V max.
+        // This limits the negative rail to be between 0V minimum and 600V maximum.
 
         float vMinus = int_range("What value is needed for the negative voltage rail of the op amp?\n", -600, 0);
+        // This limits the negative rail to be between -600V minimum and 0V maximum.
 
         float num_inputs = int_range("How many set of inputs do you want to test?\n", 0, 5);
 
@@ -105,7 +111,11 @@ int main(void) {
         }
 
         clear_buffer();
-        // This function clears the input buffer. I had problems with scanf continuously reading the input buffer when used in a loop.
+        /* This function clears the input buffer. I had problems with scanf continuously reading the input buffer when
+         * used in a loop even when using fflush to clear the input buffer.
+         * fflush(stdin) has undefined behaviour which, I think, is why it was not clearing the whole buffer.
+         * I ended up using getchar() to clear the input buffer until all that was left was a new line.
+         */
 
         char value_repeat_question[] = "\nDo you want to reset the values and try again? (Y/N)\n";
         repeat = yes_no(value_repeat_question);
@@ -131,20 +141,30 @@ int main(void) {
 
 void summing_amplifier(int vMinus, int vPlus, int num_inputs) {
     struct inputs set[num_inputs];
+    /* This defines an array that contains multiple "inputs" structures. num_inputs is used to define how many sets of
+     * inputs will be use (i.e. how many circuit calculations to do).
+     */
 
     for (int i = 0; i < num_inputs; i++) {
+        // This for loop repeats until the correct amount of sets of inputs is reached which is set by "num_inputs".
+
         char *resistor_questions[] = {
                 "What is the value for R1?\n",
                 "What is the value for R2?\n",
                 "What is the value for Rf?\n"
         };
 
+        /* Both of these character arrays store the questions to be asked to the user. They are stored in 3D arrays.
+         * They are 3D arrays because a question (first dimension), is really just a collection of characters
+         * (second dimension), and then a group of questions is stored to make the third dimension.
+         */
+
         char *voltage_questions[] = {
                 "What is the value for V1?\n",
                 "What is the value for V2?\n"
         };
 
-        set[i].id = i;
+        set[i].id = i; // Sets the ID of a structure so that the inputs can be found later after sorting has happened.
 
         if (num_inputs != 1) {
             printf("\nCircuit Number %i:\n", i + 1);
@@ -165,7 +185,6 @@ void summing_amplifier(int vMinus, int vPlus, int num_inputs) {
         gain(set[f].resistors, 2, true);
     }
 }
-
 
 void inverting_amplifier(int vMinus, int vPlus, int num_inputs) {
     struct inputs set[num_inputs];
@@ -296,7 +315,7 @@ int check_real_int(char *question) {
     int result;
     printf("%s", question);
 
-    while (scanf("%d", &result) != 1) {
+    while (scanf("%i", &result) != 1) {
         // Scanf will check try and read the input as a decimal, if it reads correctly it will output a 1. If it can't cast it to a decimal it will return a 0.
         clear_buffer();
         printf("Input was not an integer. Try again.\n");
@@ -334,9 +353,10 @@ bool yes_no(char *question) {
     }
 }
 
+// Ref: https://stackoverflow.com/questions/13372688/sorting-members-of-structure-array
 int compare(const void *a, const void *b) {
     struct inputs *left = (struct inputs *) a;
     struct inputs *right = (struct inputs *) b;
 
-    return right->vOut - left->vOut;
+    return left->vOut- right->vOut;
 }
