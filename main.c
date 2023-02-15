@@ -1,6 +1,20 @@
 #include <stdio.h>
-#include <stdbool.h>
+#include <stdbool.h> // This library is to add support for boolean data types.
 #include <stdlib.h>
+
+
+/*
+ * ----------------------------------------------------------------------------------------------------------------- *
+ *
+ * This code calculates the vOut and gain values for summing, inverting and non-inverting operation amplifier.
+ * It allows sets of inputs to be used, allowing multiple different configurations of the same amplifier to be tested.
+ * All inputs are value range checked (i.e. between 1 and 3 for example), format checked (i.e. Y or N only),
+ * data type checked (i.e. values input must be integers and cannot contain characters).
+ *
+ * ----------------------------------------------------------------------------------------------------------------- *
+ */
+
+// These are the declarations of the functions used in the program.
 
 void summing_amplifier(int vMinus, int vPlus, int num_inputs);
 
@@ -25,25 +39,42 @@ bool yes_no(char *question);
 int compare(const void *a, const void *b);
 
 
-struct inputs {
+struct inputs { // This creates a structure to store the values of a circuit. An array of these structures is used to
+
     int id;
+    /* This is a simple way to reference which set of inputs are being shown after the array has been sorted.
+     * If this was not used, it would not be easy to identify which inputs are being shown after the input array has been
+     * sorted. The sort function changes the order of the array, so the normal index cannot be used to tell the user what
+     * is being used, but the index is instead used to print out the results in the correct order.
+     */
+
     float resistors[3];
-    float voltages[2];
+    /* This makes an array of floats to store the resistor values. Using malloc() the array could have been dynamically
+     * sized, but since the maximum amount of resistors used is 3, it works for this program.
+     */
+
+    float voltages[2];  // This makes an array of floats to store the voltage values.
     float vOut;
 };
 
 int main(void) {
     bool repeat; // True for repeating the program again.
     bool repeat_a; // True for repeating the function with the same amplifier.
-    int amp_op = 0; // Used to choose the amplifier type used.
+    int amp_op = 0; // Used to store which amplifier type used.
 
     do {
-
+        /* Using a do while here is preferable because it allows the program to run fully once before asking if
+         * it should be repeated.
+         */
         if (amp_op == 0) {
             amp_op = int_range("What type of amp would you like to calculate?\n"
                                "1. Summing Amplifier\n"
                                "2. Inverting Amplifier\n"
                                "3. Non-Inverting Amplifier\n", 1, 3);
+            /* This int_range function takes a string input, which is then printed when the function is run.
+             * It also takes the min and max values of what should be acceptable inputs. If the value input is over
+             * 3 or under 1, in this example, it will state that it's out of the range, and ask again.
+             */
 
             printf("Option: %i selected.\n\n", amp_op);
         }
@@ -57,31 +88,44 @@ int main(void) {
         float num_inputs = int_range("How many set of inputs do you want to test?\n", 0, 5);
 
 
+        // This statement is used to decide which amplifier function will be run.
+        /* All the amplifiers have the max and min voltage rails, along with the number of circuits to be simulated as
+         * variables.
+         */
+
         if (amp_op == 1) {
             summing_amplifier(vMinus, vPlus, num_inputs);
+
         } else if (amp_op == 2) {
             inverting_amplifier(vMinus, vPlus, num_inputs);
+
         } else if (amp_op == 3) {
             non_inverting_amplifier(vMinus, vPlus, num_inputs);
+
         }
 
         clear_buffer();
+        // This function clears the input buffer. I had problems with scanf continuously reading the input buffer when used in a loop.
+
         char value_repeat_question[] = "\nDo you want to reset the values and try again? (Y/N)\n";
         repeat = yes_no(value_repeat_question);
+        // This function only accepts an input of Y or N, and repeat if not. The repeat variable is used to determine if the program should run again.
 
         if (repeat) {
             clear_buffer();
             char amp_repeat_question[] = "\nDo you want to use the same amplifier again? (Y/N)\n";
             repeat_a = yes_no(amp_repeat_question);
+            // The repeat_a variable is used to determined if the same amplifier should be used if when the program is run again.
 
             if (!repeat_a) {
                 amp_op = 0;
+                // If they don't want to use the same amplifier, the amplifier choice
             }
         }
 
     } while (repeat);
 
-    return 0;
+    return 0; // This can be used to tell the CLI that's running the program, that the program has been completed successfully.
 }
 
 
@@ -237,7 +281,8 @@ void gain(float *resistors, int length, bool is_invert) {
 }
 
 void clear_buffer(void) {
-    // This function clears whatever# is left from the input.
+    // This function clears whatever is left from the input.
+    fflush(stdin);
     int clear;
     do {
         clear = getchar();
