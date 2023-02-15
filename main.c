@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 void summing_amplifier(int vMinus, int vPlus, int num_inputs);
 
@@ -20,6 +21,7 @@ int check_real_int(char *question);
 float int_range(char *question, float min, float max);
 
 bool yes_no(char input, char *question);
+
 
 int main(void) {
     bool repeat; // True for repeating the program again.
@@ -162,7 +164,9 @@ void non_inverting_amplifier(int vMinus, int vPlus, int num_inputs) {
         print_questions(set[i].voltages, voltage_questions, 1, false);
 
         set[i].vOut = (set[i].voltages[0] + (set[i].voltages[0] / set[i].resistors[0]) * set[i].resistors[1]);
+
     }
+
     for (int f = 0; f < num_inputs; f++) {
         printf("Output %i:\n", f + 1);
         print_vOut(set[f].vOut, vPlus, vMinus);
@@ -267,4 +271,11 @@ bool yes_no(char input, char *question) {
 
         }
     }
+}
+
+int compare(const void *a, const void *b, float vOut) {
+    struct input *left = (struct input*) a;
+    struct input *right = (struct input*) b;
+
+    return right->vOut - left->vOut;
 }
