@@ -102,8 +102,8 @@ void summing_amplifier(int vMinus, int vPlus, int num_inputs) {
 
         set[i].id = i;
 
-        if (num_inputs != 1){
-            printf("\nCircuit Number %i:\n", i+1);
+        if (num_inputs != 1) {
+            printf("\nCircuit Number %i:\n", i + 1);
         }
 
         print_questions(set[i].resistors, resistor_questions, 3, true);
@@ -137,8 +137,8 @@ void inverting_amplifier(int vMinus, int vPlus, int num_inputs) {
 
         set[i].id = i;
 
-        if (num_inputs != 1){
-            printf("\nCircuit Number %i:\n", i+1);
+        if (num_inputs != 1) {
+            printf("\nCircuit Number %i:\n", i + 1);
         }
 
         print_questions(set[i].resistors, resistor_questions, 2, true);
@@ -170,8 +170,8 @@ void non_inverting_amplifier(int vMinus, int vPlus, int num_inputs) {
 
         set[i].id = i;
 
-        if (num_inputs != 1){
-            printf("\nCircuit Number %i:\n", i+1);
+        if (num_inputs != 1) {
+            printf("\nCircuit Number %i:\n", i + 1);
         }
 
         print_questions(set[i].resistors, resistor_questions, 2, true);
