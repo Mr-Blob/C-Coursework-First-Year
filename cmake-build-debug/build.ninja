@@ -55,12 +55,6 @@ build CMakeFiles/C_coursework.dir/main.c.o: C_COMPILER__C_coursework_Debug /home
   OBJECT_DIR = CMakeFiles/C_coursework.dir
   OBJECT_FILE_DIR = CMakeFiles/C_coursework.dir
 
-build CMakeFiles/C_coursework.dir/pain.c.o: C_COMPILER__C_coursework_Debug /home/mrblob/CLionProjects/C$ coursework/pain.c || cmake_object_order_depends_target_C_coursework
-  DEP_FILE = CMakeFiles/C_coursework.dir/pain.c.o.d
-  FLAGS = -g -fdiagnostics-color=always -std=gnu2x
-  OBJECT_DIR = CMakeFiles/C_coursework.dir
-  OBJECT_FILE_DIR = CMakeFiles/C_coursework.dir
-
 
 # =============================================================================
 # Link build statements for EXECUTABLE target C_coursework
@@ -69,7 +63,7 @@ build CMakeFiles/C_coursework.dir/pain.c.o: C_COMPILER__C_coursework_Debug /home
 #############################################
 # Link the executable C_coursework
 
-build C_coursework: C_EXECUTABLE_LINKER__C_coursework_Debug CMakeFiles/C_coursework.dir/main.c.o CMakeFiles/C_coursework.dir/pain.c.o
+build C_coursework: C_EXECUTABLE_LINKER__C_coursework_Debug CMakeFiles/C_coursework.dir/main.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/C_coursework.dir
   POST_BUILD = :
